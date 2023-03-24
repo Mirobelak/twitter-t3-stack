@@ -21,7 +21,7 @@ const CreatePostWizard = () => {
         width={56}
         height={56}
         src={user.profileImageUrl}
-        alt={`profile picture`}
+        alt="users profile picture"
       />
       <input
         placeholder="Type Some Emojis !"
@@ -39,7 +39,7 @@ const PostView = ({ post, author }: PostWithUser) => {
       <Image
         className="h-14 w-14 rounded-full"
         src={author.profileImageUrl}
-        alt={`${author.username}'s profile picture`}
+        alt="users profile picture"
         width={56}
         height={56}
         placeholder="blur"

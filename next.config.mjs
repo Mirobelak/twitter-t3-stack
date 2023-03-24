@@ -7,6 +7,9 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  images: {
+    domains: ["images.clerk.dev", "pbs.twimg.com" /* Twitter profile images */],
+  },
 
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you

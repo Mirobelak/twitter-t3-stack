@@ -1,9 +1,9 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { SignIn, useUser } from "@clerk/clerk-react";
-import { SignInButton} from "@clerk/nextjs";
-import { api} from "~/utils/api";
-import type {RouterOutputs} from "~/utils/api";
+import { SignInButton } from "@clerk/nextjs";
+import { api } from "~/utils/api";
+import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
@@ -11,45 +11,58 @@ import Image from "next/image";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
-  const {user} = useUser();
-  if(!user) return null;
+  const { user } = useUser();
+  if (!user) return null;
 
-  return (<div className="flex gap-3 w-full">
-    <Image className="rounded-full w-14 h-14"  width={56} 
-    height={56} 
-    src={user.profileImageUrl} 
-    alt={`profile picture`}
-    />
-     <input placeholder="Type Some Emojis !" className="bg-transparent grow outline-none"/>
-    </div>)
-}
+  return (
+    <div className="flex w-full gap-3">
+      <Image
+        className="h-14 w-14 rounded-full"
+        width={56}
+        height={56}
+        src={user.profileImageUrl}
+        alt={`profile picture`}
+      />
+      <input
+        placeholder="Type Some Emojis !"
+        className="grow bg-transparent outline-none"
+      />
+    </div>
+  );
+};
 
-type PostWithUser = RouterOutputs["posts"]["getAll"][number]
+type PostWithUser = RouterOutputs["posts"]["getAll"][number];
 
-const PostView = ({post, author} : PostWithUser) => {
-  return <div key={post.id} className="p-4 gap-3 border-b border-slate-400 flex" >
-    <Image className="rounded-full w-14 h-14" src={author.profileImageUrl} alt={`@${author.username}'s profile picture`}
-    width={56} 
-    height={56}
-    placeholder="blur" blurDataURL={author.profileImageUrl}
-    />
-    <div className="flex flex-col gap-2">
-      <div className="flex text-slate-300">
-        <span>{`@${author.username}`}</span>
-        <span className="font-thin">-{dayjs(post.createdAt).fromNow()}</span>
+const PostView = ({ post, author }: PostWithUser) => {
+  return (
+    <div key={post.id} className="flex gap-3 border-b border-slate-400 p-4">
+      <Image
+        className="h-14 w-14 rounded-full"
+        src={author.profileImageUrl}
+        alt={`${author.username}'s profile picture`}
+        width={56}
+        height={56}
+        placeholder="blur"
+        blurDataURL={author.profileImageUrl}
+      />
+      <div className="flex flex-col gap-2">
+        <div className="flex text-slate-300">
+          <span>{`${author.username}`}</span>
+          <span className="font-thin">-{dayjs(post.createdAt).fromNow()}</span>
         </div>
-    <span>{post.content}</span>
+        <span>{post.content}</span>
+      </div>
     </div>
-    </div>
-}
+  );
+};
 
 const Home: NextPage = () => {
   const user = useUser();
   const { data, isLoading } = api.posts.getAll.useQuery();
 
-  if(isLoading) return <div>Loading...</div>
+  if (isLoading) return <div>Loading...</div>;
 
-  if(!data) return <div>Something went wrong</div>
+  if (!data) return <div>Something went wrong</div>;
 
   return (
     <>
@@ -60,15 +73,18 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex h-screen justify-center ">
         <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
-          <div className="border-b border-slate-400 p-4 flex">
-          {!user.isSignedIn && 
-          <div className="flex justify-center"><SignInButton /></div>}
-          {user.isSignedIn && <CreatePostWizard />}
+          <div className="flex border-b border-slate-400 p-4">
+            {!user.isSignedIn && (
+              <div className="flex justify-center">
+                <SignInButton />
+              </div>
+            )}
+            {user.isSignedIn && <CreatePostWizard />}
           </div>
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
           <div className="flex flex-col">
             {data?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id}/>
+              <PostView {...fullPost} key={fullPost.post.id} />
             ))}
           </div>
         </div>

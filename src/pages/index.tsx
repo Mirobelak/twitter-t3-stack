@@ -7,25 +7,33 @@ import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingPage} from "~/components/Loading";
+import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
-
   const { user } = useUser();
 
   const [input, setInput] = useState<string>("");
 
   const ctx = api.useContext();
 
-  const {mutate, isLoading: isPosting} = api.posts.create.useMutation({
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
     onSuccess: () => {
-      setInput("") // clear input on success
-     void ctx.posts.getAll.invalidate()}
+      setInput(""); // clear input on success
+      void ctx.posts.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Something went wrong");
+      }
+    },
   });
-
 
   if (!user) return null;
 
@@ -44,9 +52,24 @@ const CreatePostWizard = () => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
         disabled={isPosting}
       />
-      <button onClick={() => mutate({content: input})}>Post</button>
+      {input !== "" && !isPosting && (
+        <button onClick={() => mutate({ content: input })}>Post</button>
+      )}
+      {isPosting && (
+        <div className="flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      )}
     </div>
   );
 };
@@ -79,30 +102,27 @@ const PostView = ({ post, author }: PostWithUser) => {
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  if(postsLoading) return <LoadingPage/>
+  if (postsLoading) return <LoadingPage />;
 
-  if(!data) return <div>Something went wrong</div>
+  if (!data) return <div>Something went wrong</div>;
 
-  return(
+  return (
     <div className="flex flex-col">
-            {data.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id} />
-            ))}
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
     </div>
-  )
-
-}
+  );
+};
 
 const Home: NextPage = () => {
-  const {isLoaded: userLoaded, isSignedIn} = useUser();
- 
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+
   //start fetching asap - in React Query you fetch only once and then use cached data
   api.posts.getAll.useQuery();
 
   // return empty div if user is not loaded yet
-  if(!userLoaded) return <div/>
-
-  
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -122,7 +142,7 @@ const Home: NextPage = () => {
             {isSignedIn && <CreatePostWizard />}
           </div>
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
-          <Feed/>
+          <Feed />
         </div>
       </main>
     </>

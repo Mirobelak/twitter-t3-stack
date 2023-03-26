@@ -16,8 +16,8 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
-import { prisma } from "~/server/db"; 
- 
+import { prisma } from "~/server/db";
+
 /**
  * This is the actual context you will use in your router. It will be used to process every request
  * that goes through your tRPC endpoint.
@@ -27,7 +27,7 @@ import { prisma } from "~/server/db";
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
   const { req } = opts;
 
-  const sesh = getAuth(req)
+  const sesh = getAuth(req);
 
   const userId = sesh.userId;
 
@@ -87,16 +87,16 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-  if(!ctx.userId){
+  if (!ctx.userId) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
-    })
+    });
   }
   return next({
     ctx: {
       userId: ctx.userId,
     },
   });
-}); 
+});
 
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);

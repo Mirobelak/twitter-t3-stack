@@ -6,9 +6,8 @@ import Image from "next/image";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import {PageLayout} from "~/components/Layout";
+import { PageLayout } from "~/components/Layout";
 import PostView from "~/components/postView";
-
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -71,8 +70,6 @@ const CreatePostWizard = () => {
   );
 };
 
-
-
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
@@ -100,18 +97,18 @@ const Home: NextPage = () => {
 
   return (
     <>
-    <PageLayout>
-          <div className="flex border-b border-slate-400 p-4">
-            {!isSignedIn && (
-              <div className="flex justify-center">
-                <SignInButton />
-              </div>
-            )}
-            {isSignedIn && <CreatePostWizard />}
-          </div>
-          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
-          <Feed />
-    </PageLayout>
+      <PageLayout>
+        <div className="flex border-b border-slate-400 p-4">
+          {!isSignedIn && (
+            <div className="flex justify-center">
+              <SignInButton />
+            </div>
+          )}
+          {isSignedIn && <CreatePostWizard />}
+        </div>
+        <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+        <Feed />
+      </PageLayout>
     </>
   );
 };

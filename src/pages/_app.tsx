@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ClerkProvider {...pageProps}>
-       <Head>
+      <Head>
         <title>Twitter T3</title>
         <meta name="description" content="🤝" />
         <link rel="icon" href="/favicon.ico" />
